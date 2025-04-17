@@ -1,0 +1,28 @@
+{
+  "name": "playmates-backend",
+  "version": "1.0.0",
+  "description": "A social sports platform that lets you create and join pickup games near you—whether it's tennis at 8 PM or a 5v5 soccer match. Find players, book spots, and get in the game—fast.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.14.1",
+    "prisma": "^6.6.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.6.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  }
+}
