@@ -46,4 +46,27 @@ export const getUsers = async () => {
         createdAt: true,
       },
     });
-  };
+};
+
+export const signInUser = async (email: string, password: string) => {
+    const user = await prisma.user.findUnique({
+        where: { email }
+    });
+    if (!user) {
+        return 'Invalid Credentials';
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        return 'Invalid Credentials';
+    } else {
+        return {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            city: user.city,
+            country: user.country,
+            createdAt: user.createdAt,
+        };
+    }
+};

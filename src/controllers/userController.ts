@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
-import { createUser, getUsers } from '../services/userService';
+import { 
+    createUser, 
+    getUsers,
+    signInUser
+} from '../services/userService';
 
 // Create User 
 export const createUserController = async (req: Request, res: Response): Promise<void> => {
@@ -24,5 +28,16 @@ export const getUsersController = async (req: Request, res: Response): Promise<v
         res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ error: 'Error fetching users' });
+    }
+}
+
+// Sign In User
+export const signInUserController = async (req: Request, res: Response): Promise<void> => {
+    const {email, password} = req.body;
+    try {
+        const user = await signInUser(email, password);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error: 'Invalid Credentials' });
     }
 }

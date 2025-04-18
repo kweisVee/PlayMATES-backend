@@ -36,3 +36,12 @@ A social sports platform that lets you create and join pickup games near you—w
 ### Install bycrypt for hashing password
 `npm install bcrypt`
 `npm install --save-dev @types/bcrypt`
+
+### Flow for creating database models, schemas, and API calls 
+1. Add a schema in schema.prisma
+2. Run your migration `npx prisma migrate dev --name init`
+3. Create the Prisma Client Helper in `src/utils/db.ts`
+4. Create the service logic
+5. Create the controller 
+6. Define the routes
+7. Initialize Express server

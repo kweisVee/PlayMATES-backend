@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { createUserController, getUsersController } from '../controllers/userController';
+import { 
+    createUserController, 
+    getUsersController, 
+    signInUserController 
+} from '../controllers/userController';
 
 const router = Router();
 
@@ -8,5 +12,8 @@ router.post('/users', createUserController);
 
 // Route for fetching all users
 router.get('/users', getUsersController);
+
+// Route for signing in a user
+router.post('/users/signin', signInUserController);
 
 export default router;
