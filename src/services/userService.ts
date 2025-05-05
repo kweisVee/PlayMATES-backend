@@ -48,6 +48,21 @@ export const getUsers = async () => {
     });
 };
 
+export const getUserProfile = async (userId: number) => {
+    return await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            city: true,
+            country: true,
+            createdAt: true,
+        },
+    });
+};
+
 export const signInUser = async (email: string, password: string) => {
     const user = await prisma.user.findUnique({
         where: { email }

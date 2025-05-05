@@ -45,3 +45,7 @@ A social sports platform that lets you create and join pickup games near you—w
 5. Create the controller 
 6. Define the routes
 7. Initialize Express server
+
+### Install JWT Library for Authentication
+`npm install jsonwebtoken`
+`npm install --save-dev @types/jsonwebtoken`
