@@ -41,11 +41,13 @@ A social sports platform that lets you create and join pickup games near you—w
 1. Add a schema in schema.prisma
 2. Run your migration `npx prisma migrate dev --name init`
 3. Create the Prisma Client Helper in `src/utils/db.ts`
-4. Create the service logic
-5. Create the controller 
-6. Define the routes
-7. Initialize Express server
+4. Create the service logic in `src/services`
+5. Create the controller in `src/controllers`
+6. Define the routes in `src/routes`
+7. If a new route file is created, make sure that you have it added to index.ts
+8. Initialize Express server
 
 ### Install JWT Library for Authentication
 `npm install jsonwebtoken`
 `npm install --save-dev @types/jsonwebtoken`
+

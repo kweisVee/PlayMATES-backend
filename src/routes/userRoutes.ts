@@ -10,13 +10,13 @@ import { authenticateToken } from '../middleware/authMiddleware';
 const router = Router();
 
 // Route for creating a new user
-router.post('/users', createUserController);
+router.post('/', createUserController);
 
 // Route for fetching all users
-router.get('/users', getUsersController);
+router.get('/', getUsersController);
 
 // Route for signing in a user
-router.post('/users/signin', signInUserController);
+router.post('/signin', signInUserController);
 
 // Route for fetching user's profile
 router.get('/profile', authenticateToken, getUserProfileController);

@@ -1,23 +1,15 @@
-import prisma from '../utils/db';
-import bcrypt from 'bcrypt';
-
-export const createUser = async (
-    firstName: string, 
-    lastName: string,
-    username: string, 
-    email: string, 
-    role: string,
-    password: string, 
-    city: string, 
-    state: string,
-    country: string
-) => {
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.signInUser = exports.getUserProfile = exports.getUsers = exports.createUser = void 0;
+const db_1 = __importDefault(require("../utils/db"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const createUser = async (firstName, lastName, username, email, role, password, city, state, country) => {
     console.log("userService: createUser starting...");
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
+    const hashedPassword = await bcrypt_1.default.hash(password, 10);
+    const user = await db_1.default.user.create({
         data: {
             firstName,
             lastName,
@@ -41,27 +33,25 @@ export const createUser = async (
         country: user.country,
         createdAt: user.createdAt,
     };
-}
-
-export const getUsers = async () => {
-    return await prisma.user.findMany({
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        city: true,
-        country: true,
-        createdAt: true,
-      },
+};
+exports.createUser = createUser;
+const getUsers = async () => {
+    return await db_1.default.user.findMany({
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            city: true,
+            country: true,
+            createdAt: true,
+        },
     });
 };
-
-export const getUserProfile = async (userId: number) => {
-
+exports.getUsers = getUsers;
+const getUserProfile = async (userId) => {
     console.log("userService: getUserProfile starting...");
-
-    return await prisma.user.findUnique({
+    return await db_1.default.user.findUnique({
         where: { id: userId },
         select: {
             id: true,
@@ -76,21 +66,20 @@ export const getUserProfile = async (userId: number) => {
         },
     });
 };
-
-export const signInUser = async (email: string, password: string) => {
-    
+exports.getUserProfile = getUserProfile;
+const signInUser = async (email, password) => {
     console.log("userService: signInUser starting...");
-    
-    const user = await prisma.user.findUnique({
+    const user = await db_1.default.user.findUnique({
         where: { email }
     });
     if (!user) {
         return 'Invalid Credentials';
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt_1.default.compare(password, user.password);
     if (!isPasswordValid) {
         return 'Invalid Credentials';
-    } else {
+    }
+    else {
         return {
             id: user.id,
             firstName: user.firstName,
@@ -103,3 +92,4 @@ export const signInUser = async (email: string, password: string) => {
         };
     }
 };
+exports.signInUser = signInUser;
