@@ -34,6 +34,7 @@ model User {
   updatedAt DateTime    @updatedAt
 
   createdSports Sport[] @relation("UserCreatedSports")
+  meetups      Meetup[] // One User can create many Meetups
   // meetups MEETUP[]
 }
 
@@ -46,7 +47,7 @@ model Sport {
   updatedAt   DateTime  @updatedAt
 
   creator     User     @relation("UserCreatedSports", fields: [createdBy], references: [id])
-  // meetups   Meetup[]  // One Sport can have many Meetups
+  meetups     Meetup[] // One Sport can have many Meetups
   
   /* 
   Why do I need createdBy Int and creator User?
@@ -60,4 +61,20 @@ model Sport {
   console.log(sport.creator.firstName);
   Without the creator relation, you can't fetch the related User object — only the numeric ID (createdBy).
   */
+}
+
+model Meetup {
+  id              Int       @id @default(autoincrement())
+  name            String
+  description     String?
+  maxParticipants Int
+  sportId         Int
+  createdBy       Int
+  location        String?
+  scheduledAt     DateTime
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  sport      Sport     @relation(fields: [sportId], references: [id])
+  creator    User      @relation(fields: [createdBy], references: [id])
 }

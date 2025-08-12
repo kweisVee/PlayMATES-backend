@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { createSport } from '../services/sportService';
-import { AuthenticatedRequest } from './userController'; // Assuming this is where the interface is defined
+import { AuthenticatedRequest } from './userController'; 
 
 export const createSportController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     console.log("sportController: createSportController Starting...");
     try {
         const {name, definition} = req.body;
 
-        // CHECK IF USER IS AUTHENTICATED
+        // CHECK IF USER IS admin
         if (!name) {
             res.status(400).json({ message: 'Sport name is required' });
             return;
