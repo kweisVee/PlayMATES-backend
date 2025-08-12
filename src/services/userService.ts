@@ -6,13 +6,12 @@ export const createUser = async (
     lastName: string,
     username: string, 
     email: string, 
-    role: string,
     password: string, 
     city: string, 
     state: string,
-    country: string
+    country: string,
+    role: string
 ) => {
-
     console.log("userService: createUser starting...");
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -59,7 +58,7 @@ export const getUsers = async () => {
 
 export const getUserProfile = async (userId: number) => {
 
-    console.log("userService: getUserProfile starting...");
+    console.log("userService: getUserProfile Starting...");
 
     return await prisma.user.findUnique({
         where: { id: userId },

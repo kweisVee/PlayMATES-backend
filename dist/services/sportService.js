@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSport = void 0;
+exports.getSport = exports.createSport = void 0;
 const db_1 = __importDefault(require("../utils/db"));
 const createSport = async (name, createdBy, definition) => {
-    console.log("sportService.ts: createSport starting...");
+    console.log("sportService: createSport starting...");
     const sport = await db_1.default.sport.create({
         data: {
             name,
@@ -25,3 +25,18 @@ const createSport = async (name, createdBy, definition) => {
     return sport;
 };
 exports.createSport = createSport;
+const getSport = async (sportId) => {
+    console.log("sportService: getSport Starting...");
+    return await db_1.default.sport.findUnique({
+        where: { id: sportId },
+        include: {
+            creator: {
+                select: {
+                    id: true,
+                    username: true
+                }
+            }
+        }
+    });
+};
+exports.getSport = getSport;

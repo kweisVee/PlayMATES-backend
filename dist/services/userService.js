@@ -50,7 +50,7 @@ const getUsers = async () => {
 };
 exports.getUsers = getUsers;
 const getUserProfile = async (userId) => {
-    console.log("userService: getUserProfile starting...");
+    console.log("userService: getUserProfile Starting...");
     return await db_1.default.user.findUnique({
         where: { id: userId },
         select: {

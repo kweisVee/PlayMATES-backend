@@ -6,7 +6,7 @@ const createSportController = async (req, res) => {
     console.log("sportController: createSportController Starting...");
     try {
         const { name, definition } = req.body;
-        // CHECK IF USER IS AUTHENTICATED
+        // CHECK IF USER IS admin
         if (!name) {
             res.status(400).json({ message: 'Sport name is required' });
             return;
