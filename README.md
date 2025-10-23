@@ -51,3 +51,16 @@ A social sports platform that lets you create and join pickup games near you—w
 `npm install jsonwebtoken`
 `npm install --save-dev @types/jsonwebtoken`
 
+### Install CORS so that the frontend could access your backend 
+`npm install cors`
+`npm install --save-dev @types/cors`
+
+### Practice API versioning
+- We want to do best practice for API versioning, and these are the steps created: 
+1. added `versionMiddleware.ts`
+2. Update your calls to include headers such as Content-Type and api-version
+
+- When do we add Content-Type header? 
+    - Sample is Content-Type: application/json
+    - This is needed for POST/PUT/PATCH Methods (Sending Data)
+    - The server needs to know: "What format is this data in?" and "How should I parse this body?"

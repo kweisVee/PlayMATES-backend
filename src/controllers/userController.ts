@@ -9,12 +9,15 @@ import {
 
 export interface AuthenticatedRequest extends Request {
     user?: { userId: number };
+    apiVersion?: string;
 }
 
 // Create User 
-export const createUserController = async (req: Request, res: Response): Promise<void> => {
+export const createUserController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     console.log("userController: createUserController Starting...");
+    console.log("userController: API Version:", req.apiVersion);
     try {
+        console.log("userController: createUserController req.body:", req.body);
         const {firstName, lastName, username, email, password, city, state, country, role} = req.body;
 
         if (!firstName || !lastName || !email || !password) {
@@ -38,8 +41,9 @@ export const createUserController = async (req: Request, res: Response): Promise
 }
 
 // Get Users 
-export const getUsersController = async (req: Request, res: Response): Promise<void> => {
+export const getUsersController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     console.log("userController: getUsersController starting...");
+    console.log("userController: API Version:", req.apiVersion);
     try {
         const users = await getUsers();
         res.status(200).json(users);
@@ -53,9 +57,10 @@ export const getUsersController = async (req: Request, res: Response): Promise<v
 }
 
 // Sign In User
-export const signInUserController = async (req: Request, res: Response): Promise<void> => {
+export const signInUserController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     
     console.log("userController: signInUserController Starting...");
+    console.log("userController: API Version:", req.apiVersion);
     
     const {email, password} = req.body;
     try {
