@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.signInUser = exports.getUserProfile = exports.getUsers = exports.createUser = void 0;
 const db_1 = __importDefault(require("../utils/db"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const createUser = async (firstName, lastName, username, email, role, password, city, state, country) => {
+const createUser = async (firstName, lastName, username, email, password, city, state, country, role) => {
     console.log("userService: createUser starting...");
     const hashedPassword = await bcrypt_1.default.hash(password, 10);
     const user = await db_1.default.user.create({

@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { versionMiddleware } from './middleware/versionMiddleware';
 import userRoutes from './routes/userRoutes';
 import sportRoutes from './routes/sportRoutes';
@@ -19,6 +20,8 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'api-version', 'X-Requested-With']
 }));
 
+// Add cookie-parser middleware BEFORE routes
+app.use(cookieParser());
 app.use(express.json());
 
 // Apply versioning middleware to all API routes

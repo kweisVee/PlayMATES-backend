@@ -10,6 +10,8 @@ router.post('/', userController_1.createUserController);
 router.get('/', userController_1.getUsersController);
 // Route for signing in a user
 router.post('/signin', userController_1.signInUserController);
+// Route for signing out a user
+router.post('/signout', userController_1.signOutUserController);
 // Route for fetching user's profile
 router.get('/profile', authMiddleware_1.authenticateToken, userController_1.getUserProfileController);
 exports.default = router;
