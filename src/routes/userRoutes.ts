@@ -3,7 +3,8 @@ import {
     createUserController, 
     getUsersController, 
     getUserProfileController,
-    signInUserController 
+    signInUserController,
+    signOutUserController
 } from '../controllers/userController';
 import { authenticateToken } from '../middleware/authMiddleware';
 
@@ -17,6 +18,9 @@ router.get('/', getUsersController);
 
 // Route for signing in a user
 router.post('/signin', signInUserController);
+
+// Route for signing out a user
+router.post('/signout', signOutUserController);
 
 // Route for fetching user's profile
 router.get('/profile', authenticateToken, getUserProfileController);

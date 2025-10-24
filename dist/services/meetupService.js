@@ -32,5 +32,6 @@ const createMeetup = async (name, maxParticipants, sportId, createdBy, scheduled
             }
         }
     });
+    return meetup;
 };
 exports.createMeetup = createMeetup;

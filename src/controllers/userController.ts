@@ -26,9 +26,18 @@ export const createUserController = async (req: AuthenticatedRequest, res: Respo
         }
         const user = await createUser(firstName, lastName, username, email, password, city, state, country, role);
         const token = generateToken(user.id);
-        res.status(200).json({
+        
+        // Set token as httpOnly cookie
+        res.cookie('token', token, {
+            httpOnly: true,      // JavaScript cannot access this cookie
+            secure: process.env.NODE_ENV === 'production', // Only HTTPS in production
+            sameSite: 'strict',  // CSRF protection
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+            path: '/',           // Cookie available on all routes
+        });
+        
+        res.status(201).json({
             message: 'User Created Successfully',
-            token,
             user: user,
         });
     } catch (error) {
@@ -73,8 +82,16 @@ export const signInUserController = async (req: AuthenticatedRequest, res: Respo
 
         const token = generateToken(user.id);
 
+        // Set token as httpOnly cookie
+        res.cookie('token', token, {
+            httpOnly: true,      // JavaScript cannot access this cookie
+            secure: process.env.NODE_ENV === 'production', // Only HTTPS in production
+            sameSite: 'strict',  // CSRF protection
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+            path: '/',           // Cookie available on all routes
+        });
+
         res.status(200).json({
-            token,
             user: user,
         });
     } catch (error) {
@@ -107,6 +124,29 @@ export const getUserProfileController = async (req: AuthenticatedRequest, res: R
         res.status(200).json(user);
     } catch (error) {
         console.error('userController: getUserProfileController ERROR:', {
+            message: (error as Error).message,
+            stack: (error as Error).stack,
+        });
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+// Sign Out User
+export const signOutUserController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    console.log("userController: signOutUserController Starting...");
+    try {
+        // Clear the cookie by setting it to empty with immediate expiration
+        res.cookie('token', '', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            expires: new Date(0), // Expire immediately
+            path: '/',
+        });
+
+        res.status(200).json({ message: 'Signed out successfully' });
+    } catch (error) {
+        console.error('userController: signOutUserController ERROR:', {
             message: (error as Error).message,
             stack: (error as Error).stack,
         });
