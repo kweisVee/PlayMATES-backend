@@ -14,4 +14,6 @@ router.post('/signin', userController_1.signInUserController);
 router.post('/signout', userController_1.signOutUserController);
 // Route for fetching user's profile
 router.get('/profile', authMiddleware_1.authenticateToken, userController_1.getUserProfileController);
+// Route for updating user's profile
+router.put('/profile', authMiddleware_1.authenticateToken, userController_1.updateUserProfileController);
 exports.default = router;

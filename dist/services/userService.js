@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signInUser = exports.getUserProfile = exports.getUsers = exports.createUser = void 0;
+exports.signInUser = exports.updateUserProfile = exports.getUserProfile = exports.getUsers = exports.createUser = void 0;
 const db_1 = __importDefault(require("../utils/db"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const createUser = async (firstName, lastName, username, email, password, city, state, country, role) => {
@@ -67,6 +67,33 @@ const getUserProfile = async (userId) => {
     });
 };
 exports.getUserProfile = getUserProfile;
+const updateUserProfile = async (userId, data) => {
+    console.log("userService: updateUserProfile Starting...");
+    const user = await db_1.default.user.update({
+        where: { id: userId },
+        data: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            city: data.city,
+            state: data.state,
+            country: data.country,
+            role: data.role === 'ADMIN' ? 'ADMIN' : 'USER',
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            role: true,
+            city: true,
+            state: true,
+            country: true,
+            createdAt: true,
+        },
+    });
+    return user;
+};
+exports.updateUserProfile = updateUserProfile;
 const signInUser = async (email, password) => {
     console.log("userService: signInUser starting...");
     const user = await db_1.default.user.findUnique({
@@ -85,6 +112,7 @@ const signInUser = async (email, password) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            role: user.role,
             city: user.city,
             state: user.state,
             country: user.country,

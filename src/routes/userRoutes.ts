@@ -3,6 +3,7 @@ import {
     createUserController, 
     getUsersController, 
     getUserProfileController,
+    updateUserProfileController,
     signInUserController,
     signOutUserController
 } from '../controllers/userController';
@@ -24,5 +25,8 @@ router.post('/signout', signOutUserController);
 
 // Route for fetching user's profile
 router.get('/profile', authenticateToken, getUserProfileController);
+
+// Route for updating user's profile
+router.put('/profile', authenticateToken, updateUserProfileController);
 
 export default router;
