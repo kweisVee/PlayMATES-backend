@@ -4,6 +4,7 @@ import {
     createUser, 
     getUsers,
     getUserProfile,
+    updateUserProfile,
     signInUser
 } from '../services/userService';
 
@@ -124,6 +125,43 @@ export const getUserProfileController = async (req: AuthenticatedRequest, res: R
         res.status(200).json(user);
     } catch (error) {
         console.error('userController: getUserProfileController ERROR:', {
+            message: (error as Error).message,
+            stack: (error as Error).stack,
+        });
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+// Update User Profile
+export const updateUserProfileController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    console.log("userController: updateUserProfileController Starting...");
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            res.status(401).json({ message: 'Unauthorized. No user ID found.' });
+            return;
+        }
+
+        const { firstName, lastName, city, state, country, role } = req.body;
+
+        const updatedUser = await updateUserProfile(userId, {
+            firstName,
+            lastName,
+            city,
+            state,
+            country,
+            role,
+        });
+
+        if (!updatedUser) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.error('userController: updateUserProfileController ERROR:', {
             message: (error as Error).message,
             stack: (error as Error).stack,
         });

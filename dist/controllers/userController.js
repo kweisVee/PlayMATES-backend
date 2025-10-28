@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signOutUserController = exports.getUserProfileController = exports.signInUserController = exports.getUsersController = exports.createUserController = void 0;
+exports.signOutUserController = exports.updateUserProfileController = exports.getUserProfileController = exports.signInUserController = exports.getUsersController = exports.createUserController = void 0;
 const jwt_1 = require("../utils/jwt");
 const userService_1 = require("../services/userService");
 // Create User 
@@ -113,6 +113,39 @@ const getUserProfileController = async (req, res) => {
     }
 };
 exports.getUserProfileController = getUserProfileController;
+// Update User Profile
+const updateUserProfileController = async (req, res) => {
+    console.log("userController: updateUserProfileController Starting...");
+    try {
+        const userId = req.user?.userId;
+        if (!userId) {
+            res.status(401).json({ message: 'Unauthorized. No user ID found.' });
+            return;
+        }
+        const { firstName, lastName, city, state, country, role } = req.body;
+        const updatedUser = await (0, userService_1.updateUserProfile)(userId, {
+            firstName,
+            lastName,
+            city,
+            state,
+            country,
+            role,
+        });
+        if (!updatedUser) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+        res.status(200).json(updatedUser);
+    }
+    catch (error) {
+        console.error('userController: updateUserProfileController ERROR:', {
+            message: error.message,
+            stack: error.stack,
+        });
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.updateUserProfileController = updateUserProfileController;
 // Sign Out User
 const signOutUserController = async (req, res) => {
     console.log("userController: signOutUserController Starting...");

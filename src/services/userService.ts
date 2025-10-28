@@ -76,6 +76,45 @@ export const getUserProfile = async (userId: number) => {
     });
 };
 
+export const updateUserProfile = async (
+    userId: number,
+    data: {
+        firstName?: string;
+        lastName?: string;
+        city?: string;
+        state?: string;
+        country?: string;
+        role?: string;
+    }
+) => {
+    console.log("userService: updateUserProfile Starting...");
+
+    const user = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            city: data.city,
+            state: data.state,
+            country: data.country,
+            role: data.role === 'ADMIN' ? 'ADMIN' : 'USER',
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            role: true,
+            city: true,
+            state: true,
+            country: true,
+            createdAt: true,
+        },
+    });
+
+    return user;
+};
+
 export const signInUser = async (email: string, password: string) => {
     
     console.log("userService: signInUser starting...");
@@ -95,6 +134,7 @@ export const signInUser = async (email: string, password: string) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            role: user.role,
             city: user.city,
             state: user.state,
             country: user.country,
