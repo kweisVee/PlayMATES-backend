@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import { createSport } from '../services/sportService';
-import { AuthenticatedRequest } from './userController'; 
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 export const createSportController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     console.log("sportController: createSportController Starting...");
     try {
-        const {name, definition} = req.body;
-
+        const {name, definition, imageUrl, category, isActive} = req.body;
+    
         // CHECK IF USER IS admin
         if (!name) {
             res.status(400).json({ message: 'Sport name is required' });
@@ -18,9 +18,23 @@ export const createSportController = async (req: AuthenticatedRequest, res: Resp
             return;
         }
 
-        const createdBy = req.user.userId;
+        if (req.user.role !== 'ADMIN') {
+            res.status(403).json({ message: 'Unauthorized. Only admins can create sports.' });
+            return;
+        }
 
-        const sport = await createSport(name, createdBy, definition);
+        const createdBy = req.user.userId;
+        
+        // Ensure isActive is a boolean if provided, default to true
+        /**
+            {
+                "name": "Tennis",
+                "isActive": "yes"  // ← Wrong type, now defaults to true
+            }
+         */
+        const isActiveBool = typeof isActive === 'boolean' ? isActive : true;
+
+        const sport = await createSport(name, createdBy, definition, imageUrl, category, isActiveBool);
         
         res.status(201).json({ message: 'Sport created successfully', sport });
     } catch (error) {

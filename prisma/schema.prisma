@@ -42,6 +42,9 @@ model Sport {
   id          Int       @id @default(autoincrement())
   name        String    @unique
   definition  String?
+  imageUrl    String?   // NEW: URL to sport icon/image
+  category    String?   // NEW: Sport category (e.g., "Team Sport", "Racquet Sport")
+  isActive    Boolean   @default(true)
   createdBy   Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
