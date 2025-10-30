@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
 
-interface AuthenticatedRequest extends Request {
-    user?: { userId: number };
+export interface AuthenticatedRequest extends Request {
+    user?: { 
+        userId: number,
+        role: string
+    };
+    apiVersion?: string;
 }
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction): void => {
@@ -21,8 +25,11 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     }
 
     try {
-        const user = verifyToken(token) as { userId: number };
-        (req as AuthenticatedRequest).user = user;
+        const user = verifyToken(token) as { userId: number, role: string };
+        (req as AuthenticatedRequest).user = {
+            userId: user.userId,
+            role: user.role
+        };
         console.log("authMiddleware: Successfully authenticated user:", user.userId);
         next();
     } catch (error) {

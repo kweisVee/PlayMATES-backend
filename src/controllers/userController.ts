@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { generateToken } from '../utils/jwt';
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { 
     createUser, 
     getUsers,
@@ -8,10 +9,6 @@ import {
     signInUser
 } from '../services/userService';
 
-export interface AuthenticatedRequest extends Request {
-    user?: { userId: number };
-    apiVersion?: string;
-}
 
 // Create User 
 export const createUserController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -26,7 +23,7 @@ export const createUserController = async (req: AuthenticatedRequest, res: Respo
             return;
         }
         const user = await createUser(firstName, lastName, username, email, password, city, state, country, role);
-        const token = generateToken(user.id);
+        const token = generateToken(user.id, user.role);
         
         // Set token as httpOnly cookie
         res.cookie('token', token, {
@@ -81,7 +78,7 @@ export const signInUserController = async (req: AuthenticatedRequest, res: Respo
             return;
         }
 
-        const token = generateToken(user.id);
+        const token = generateToken(user.id, user.role);
 
         // Set token as httpOnly cookie
         res.cookie('token', token, {

@@ -3,13 +3,19 @@ import prisma from "../utils/db";
 export const createSport = async (
     name: string, 
     createdBy: number,
-    definition?: string
+    definition?: string, 
+    imageUrl?: string,
+    category?: string, 
+    isActive: boolean = true
 ) => {
     console.log("sportService: createSport starting...");
     const sport = await prisma.sport.create({
         data: {
             name,
             definition,
+            imageUrl,
+            category,
+            isActive,
             createdBy
         }, 
         include: {
