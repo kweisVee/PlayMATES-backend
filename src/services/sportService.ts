@@ -45,3 +45,22 @@ export const getSport = async (sportId: number) => {
         }
     });
 };
+
+export const getAllSports = async () => {
+    console.log("sportService: getAllSports Starting...");
+
+    return await prisma.sport.findMany({
+        where: { isActive: true },
+        include: {
+            creator: {
+                select: {
+                    id: true,
+                    username: true
+                }
+            }
+        }, 
+        orderBy: {
+            name: 'asc'
+        }
+    });
+}
