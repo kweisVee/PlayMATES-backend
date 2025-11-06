@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createSport } from '../services/sportService';
+import { createSport, getAllSports } from '../services/sportService';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 export const createSportController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -39,6 +39,20 @@ export const createSportController = async (req: AuthenticatedRequest, res: Resp
         res.status(201).json({ message: 'Sport created successfully', sport });
     } catch (error) {
         console.error('sportController: createSportController ERROR:', {
+            message: (error as Error).message,
+            stack: (error as Error).stack,
+        });
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const getAllSportsController = async (req: Request, res: Response): Promise<void> => {
+    console.log("sportController: getAllSportsController Starting...");
+    try {
+        const sports = await getAllSports();
+        res.status(200).json(sports);
+    } catch (error) {
+        console.error('sportController: getAllSportsController ERROR:', {
             message: (error as Error).message,
             stack: (error as Error).stack,
         });
