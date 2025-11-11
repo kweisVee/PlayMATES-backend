@@ -29,7 +29,7 @@ app.use('/api', versionMiddleware);
 
 app.use('/api/user', userRoutes);
 app.use('/api/sports', sportRoutes);
-app.use('/api/meetups', meetupRoutes);
+app.use('/api/meetup', meetupRoutes);
 
 
 const PORT = process.env.PORT || 3001;

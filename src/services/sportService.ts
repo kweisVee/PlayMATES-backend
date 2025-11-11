@@ -46,6 +46,22 @@ export const getSport = async (sportId: number) => {
     });
 };
 
+export const getSportByName = async (name: string) => {
+    console.log("sportService: getSportByName Starting...");
+
+    return await prisma.sport.findUnique({
+        where: { name },
+        include: {
+            creator: {
+                select: {
+                    id: true,
+                    username: true
+                }
+            }
+        }
+    });
+};
+
 export const getAllSports = async () => {
     console.log("sportService: getAllSports Starting...");
 
