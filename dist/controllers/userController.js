@@ -15,7 +15,7 @@ const createUserController = async (req, res) => {
             return;
         }
         const user = await (0, userService_1.createUser)(firstName, lastName, username, email, password, city, state, country, role);
-        const token = (0, jwt_1.generateToken)(user.id);
+        const token = (0, jwt_1.generateToken)(user.id, user.role);
         // Set token as httpOnly cookie
         res.cookie('token', token, {
             httpOnly: true, // JavaScript cannot access this cookie
@@ -66,7 +66,7 @@ const signInUserController = async (req, res) => {
             res.status(401).json({ message: 'Invalid credentials' });
             return;
         }
-        const token = (0, jwt_1.generateToken)(user.id);
+        const token = (0, jwt_1.generateToken)(user.id, user.role);
         // Set token as httpOnly cookie
         res.cookie('token', token, {
             httpOnly: true, // JavaScript cannot access this cookie

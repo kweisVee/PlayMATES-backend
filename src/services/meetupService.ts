@@ -1,23 +1,34 @@
+import { SkillLevel } from "@prisma/client";
 import prisma from "../utils/db";
 
 export const createMeetup = async (
-    name: string, 
+    title: string, 
     maxParticipants: number,
     sportId: number, 
     createdBy: number,
     scheduledAt: Date,
     description?: string,
-    location?: string
+    location?: string,
+    city?: string,
+    state?: string,
+    sportIcon?: string,
+    sportColor?: string,
+    skillLevel?: SkillLevel
 ) => {
     console.log("meetupService.ts: createMeetup starting...");
     const meetup = await prisma.meetup.create({
         data: {
-            name,
+            title,
             description,
             maxParticipants,
             sportId,
             createdBy,
             location,
+            city,
+            state,
+            sportIcon,
+            sportColor,
+            skillLevel,
             scheduledAt
         },
         include: {
@@ -35,5 +46,6 @@ export const createMeetup = async (
             }
         }
     });
+    console.log("meetupService.ts: meetup created:", meetup);
     return meetup;
 }

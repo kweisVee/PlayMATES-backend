@@ -14,7 +14,10 @@ const authenticateToken = (req, res, next) => {
     }
     try {
         const user = (0, jwt_1.verifyToken)(token);
-        req.user = user;
+        req.user = {
+            userId: user.userId,
+            role: user.role
+        };
         console.log("authMiddleware: Successfully authenticated user:", user.userId);
         next();
     }

@@ -5,10 +5,13 @@ const meetupService_1 = require("../services/meetupService");
 const sportService_1 = require("../services/sportService");
 const createMeetupController = async (req, res) => {
     console.log("meetupController: createMeetupController Starting...");
+    console.log("meetupController: Request body:", req.body);
     try {
-        const { name, maxParticipants, sportId, scheduledAt, description, location } = req.body;
-        if (!name || !maxParticipants || !sportId || !scheduledAt) {
-            res.status(400).json({ message: 'All fields are required' });
+        // Extract fields from frontend payload
+        const { title, description, sport, sportIcon, sportColor, location, city, state, date, time, maxParticipants, skillLevel } = req.body;
+        // Validate required fields
+        if (!title || !sport || !location || !date || !time || !maxParticipants) {
+            res.status(400).json({ message: 'Required fields: title, sport, location, date, time, maxParticipants' });
             return;
         }
         if (!req.user?.userId) {
@@ -16,12 +19,23 @@ const createMeetupController = async (req, res) => {
             return;
         }
         const createdBy = req.user.userId;
-        const existingSport = await (0, sportService_1.getSport)(sportId);
+        // Look up sport by name to get sportId
+        const existingSport = await (0, sportService_1.getSportByName)(sport);
         if (!existingSport) {
-            res.status(404).json({ message: 'Sport not found' });
+            res.status(404).json({ message: `Sport '${sport}' not found` });
             return;
         }
-        const meetup = await (0, meetupService_1.createMeetup)(name, maxParticipants, sportId, createdBy, scheduledAt, description, location);
+        // Combine date and time into a DateTime object
+        const scheduledAt = new Date(`${date}T${time}`);
+        // Validate the date
+        if (isNaN(scheduledAt.getTime())) {
+            res.status(400).json({ message: 'Invalid date or time format' });
+            return;
+        }
+        // Convert skillLevel to uppercase to match enum (frontend sends lowercase)
+        const normalizedSkillLevel = (skillLevel?.toUpperCase() || 'ALL');
+        // Create the meetup with all fields
+        const meetup = await (0, meetupService_1.createMeetup)(title, maxParticipants, existingSport.id, createdBy, scheduledAt, description, location, city, state, sportIcon, sportColor, normalizedSkillLevel);
         res.status(201).json({
             message: 'Meetup created successfully',
             meetup: meetup

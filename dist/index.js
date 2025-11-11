@@ -28,7 +28,7 @@ app.use(express_1.default.json());
 app.use('/api', versionMiddleware_1.versionMiddleware);
 app.use('/api/user', userRoutes_1.default);
 app.use('/api/sports', sportRoutes_1.default);
-app.use('/api/meetups', meetupRoutes_1.default);
+app.use('/api/meetup', meetupRoutes_1.default);
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 exports.default = app;
