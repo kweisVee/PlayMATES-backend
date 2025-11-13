@@ -49,3 +49,36 @@ export const createMeetup = async (
     console.log("meetupService.ts: meetup created:", meetup);
     return meetup;
 }
+
+export const getAllMeetups = async () => {
+    console.log("meetupService.ts: getAllMeetups starting...");
+    const now = new Date();
+    // we want to get all meetups that are scheduled to start 15 mins before the current time
+    // and onwards
+    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
+    
+    return await prisma.meetup.findMany({
+        where: {
+            scheduledAt: {
+                gte: fifteenMinutesAgo
+            }
+        }
+    })
+}
+
+export const getUserMeetups = async (userId: number) => {
+    console.log("meetupService.ts: getUserMeetups starting...");
+    return await prisma.meetup.findMany({
+        where: {
+            createdBy: userId
+        },
+        include: {
+            sport: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            }
+        }
+    })
+}
