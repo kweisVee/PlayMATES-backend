@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createMeetup } from "../services/meetupService";
+import { createMeetup, getAllMeetups, getUserMeetups } from "../services/meetupService";
 import { getSportByName } from "../services/sportService";
 import { AuthenticatedRequest } from './userController';
 import { SkillLevel } from "@prisma/client";
@@ -85,4 +85,39 @@ export const createMeetupController = async (req: AuthenticatedRequest, res: Res
         });
         res.status(500).json({ message: 'Internal server error' });
     }   
+}
+
+export const getAllMeetupsController = async (req: Request, res: Response): Promise<void> => {
+    console.log("meetupController: getAllMeetupsController Starting...");
+    try {
+        const meetups = await getAllMeetups();
+        res.status(200).json(meetups);
+    } catch (error) {
+        console.error('meetupController: getAllMeetupsController ERROR:', {
+            message: (error as Error).message,
+            stack: (error as Error).stack,
+        });
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const getUserMeetupsController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    console.log("meetupController: getUserMeetupsController Starting...");
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            res.status(401).json({ message: 'Unauthorized. No user ID found.' });
+            return;
+        }
+
+        const meetups = await getUserMeetups(userId);
+        res.status(200).json(meetups);
+    } catch (error) {
+        console.error('meetupController: getUserMeetupsController ERROR:', {
+            message: (error as Error).message,
+            stack: (error as Error).stack,
+        });
+        res.status(500).json({ message: 'Internal server error' });
+    }
 }
