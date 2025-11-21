@@ -62,6 +62,20 @@ export const getAllMeetups = async () => {
             scheduledAt: {
                 gte: fifteenMinutesAgo
             }
+        },
+        include: {
+            creator: {
+                select: {
+                    id: true,
+                    username: true
+                }
+            },
+            sport: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            }
         }
     })
 }
@@ -73,6 +87,12 @@ export const getUserMeetups = async (userId: number) => {
             createdBy: userId
         },
         include: {
+            creator: {
+                select: {
+                    id: true,
+                    username: true
+                }
+            },
             sport: {
                 select: {
                     id: true,
