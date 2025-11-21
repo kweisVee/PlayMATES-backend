@@ -91,7 +91,34 @@ export const getAllMeetupsController = async (req: Request, res: Response): Prom
     console.log("meetupController: getAllMeetupsController Starting...");
     try {
         const meetups = await getAllMeetups();
-        res.status(200).json(meetups);
+        
+        // Transform the data to match frontend expectations
+        const transformedMeetups = meetups.map((meetup: any) => {
+            const scheduledDate = new Date(meetup.scheduledAt);
+            return {
+                id: meetup.id.toString(),
+                title: meetup.title,
+                description: meetup.description || "",
+                sport: meetup.sport?.name || "",
+                sportIcon: meetup.sportIcon,
+                sportColor: meetup.sportColor,
+                hostId: meetup.createdBy.toString(),
+                hostName: meetup.creator?.username || "",
+                location: meetup.location || "",
+                city: meetup.city || "",
+                state: meetup.state || "",
+                date: scheduledDate.toISOString().split('T')[0], // YYYY-MM-DD format
+                time: scheduledDate.toTimeString().slice(0, 5), // HH:MM format
+                maxParticipants: meetup.maxParticipants,
+                currentParticipants: 1, // Default to 1 (the creator)
+                skillLevel: meetup.skillLevel?.toLowerCase() || "all",
+                status: "upcoming",
+                createdAt: meetup.createdAt,
+                updatedAt: meetup.updatedAt
+            };
+        });
+        
+        res.status(200).json(transformedMeetups);
     } catch (error) {
         console.error('meetupController: getAllMeetupsController ERROR:', {
             message: (error as Error).message,
@@ -112,7 +139,34 @@ export const getUserMeetupsController = async (req: AuthenticatedRequest, res: R
         }
 
         const meetups = await getUserMeetups(userId);
-        res.status(200).json(meetups);
+        
+        // Transform the data to match frontend expectations
+        const transformedMeetups = meetups.map((meetup: any) => {
+            const scheduledDate = new Date(meetup.scheduledAt);
+            return {
+                id: meetup.id.toString(),
+                title: meetup.title,
+                description: meetup.description || "",
+                sport: meetup.sport?.name || "",
+                sportIcon: meetup.sportIcon,
+                sportColor: meetup.sportColor,
+                hostId: meetup.createdBy.toString(),
+                hostName: meetup.creator?.username || "",
+                location: meetup.location || "",
+                city: meetup.city || "",
+                state: meetup.state || "",
+                date: scheduledDate.toISOString().split('T')[0], // YYYY-MM-DD format
+                time: scheduledDate.toTimeString().slice(0, 5), // HH:MM format
+                maxParticipants: meetup.maxParticipants,
+                currentParticipants: 1, // Default to 1 (the creator)
+                skillLevel: meetup.skillLevel?.toLowerCase() || "all",
+                status: "upcoming",
+                createdAt: meetup.createdAt,
+                updatedAt: meetup.updatedAt
+            };
+        });
+        
+        res.status(200).json(transformedMeetups);
     } catch (error) {
         console.error('meetupController: getUserMeetupsController ERROR:', {
             message: (error as Error).message,
