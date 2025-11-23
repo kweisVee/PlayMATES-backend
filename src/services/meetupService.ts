@@ -102,3 +102,24 @@ export const getUserMeetups = async (userId: number) => {
         }
     })
 }
+
+export const getMeetup = async (meetupId: number) => {
+    console.log("meetupService.ts: getMeetup starting...");
+    return await prisma.meetup.findUnique({
+        where: { id: meetupId },
+        include: {
+            creator: {
+                select: {
+                    id: true,
+                    username: true
+                }
+            },
+            sport: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            }
+        }
+    });
+}
