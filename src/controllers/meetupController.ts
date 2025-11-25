@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
-import { createMeetup, getAllMeetups, getUserMeetups } from "../services/meetupService";
+import { createMeetup, 
+        getAllMeetups, 
+        getUserMeetups, 
+        getMeetup,
+        updateMeetup
+    } from "../services/meetupService";
 import { getSportByName } from "../services/sportService";
 import { AuthenticatedRequest } from './userController';
 import { SkillLevel } from "@prisma/client";
@@ -36,7 +41,7 @@ export const createMeetupController = async (req: AuthenticatedRequest, res: Res
             return;
         }
 
-        const createdBy = req.user.userId;
+        const userId = req.user.userId;
 
         // Look up sport by name to get sportId
         const existingSport = await getSportByName(sport);
@@ -59,12 +64,14 @@ export const createMeetupController = async (req: AuthenticatedRequest, res: Res
         const normalizedSkillLevel = (skillLevel?.toUpperCase() || 'ALL') as SkillLevel;
 
         // Create the meetup with all fields
+        // When creating, the creator is also the updater
         const meetup = await createMeetup(
             title,
             maxParticipants,
             existingSport.id,
-            createdBy,
+            userId,
             scheduledAt,
+            userId, // updatedBy: set to creator's ID on creation
             description,
             location,
             city,
@@ -169,6 +176,142 @@ export const getUserMeetupsController = async (req: AuthenticatedRequest, res: R
         res.status(200).json(transformedMeetups);
     } catch (error) {
         console.error('meetupController: getUserMeetupsController ERROR:', {
+            message: (error as Error).message,
+            stack: (error as Error).stack,
+        });
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const getMeetupController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    console.log("meetupController: getMeetupController Starting...");
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            res.status(401).json({ message: 'Unauthorized. No user ID found.' });
+            return;
+        }
+
+        const meetupId = parseInt(req.params.id);
+
+        // Validate that meetupId is a valid number
+        if (isNaN(meetupId) || meetupId <= 0) {
+            res.status(400).json({ message: 'Invalid meetup ID' });
+            return;
+        }
+
+        const meetup = await getMeetup(meetupId);
+
+        if (!meetup) {
+            res.status(404).json({ message: 'Meetup not found' });
+            return;
+        }
+
+        res.status(200).json(meetup);
+    } catch (error) {
+        console.error('meetupController: getMeetupController ERROR:', {
+            message: (error as Error).message,
+            stack: (error as Error).stack,
+        });
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const updateMeetupController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    console.log("meetupController: updateMeetupController Starting...");
+    console.log("meetupController: Request body:", req.body);
+
+    try {
+        const userId = req.user?.userId;
+        if (!userId) {
+            res.status(401).json({ message: 'Unauthorized. No user ID found.' });
+            return;
+        }
+
+        const meetupId = parseInt(req.params.id);
+        if (isNaN(meetupId) || meetupId <= 0) {
+            res.status(400).json({ message: 'Invalid meetup ID' });
+            return;
+        }
+
+        const existingMeetup = await getMeetup(meetupId);
+        if (!existingMeetup) {
+            res.status(404).json({ message: 'Meetup not found' });
+            return;
+        }
+
+        // Authorization: Only the creator can update
+        if (existingMeetup.createdBy !== userId) {
+            res.status(403).json({ message: 'Forbidden. You can only update meetups you created.' });
+            return;
+        }
+
+        // Extract fields from request body
+        const {
+            title,
+            description,
+            sport,
+            sportIcon,
+            sportColor,
+            location,
+            city,
+            state,
+            date,
+            time,
+            maxParticipants,
+            skillLevel
+        } = req.body;
+
+        // Build update parameters
+        let sportId: number | undefined;
+        if (sport) {
+            const existingSport = await getSportByName(sport);
+            if (!existingSport) {
+                res.status(404).json({ message: `Sport '${sport}' not found` });
+                return;
+            }
+            sportId = existingSport.id;
+        }
+
+        // Combine date and time if both are provided
+        let scheduledAt: Date | undefined;
+        if (date && time) {
+            scheduledAt = new Date(`${date}T${time}`);
+            if (isNaN(scheduledAt.getTime())) {
+                res.status(400).json({ message: 'Invalid date or time format' });
+                return;
+            }
+        }
+
+        // Normalize skillLevel if provided
+        const normalizedSkillLevel = skillLevel 
+            ? (skillLevel.toUpperCase() as SkillLevel)
+            : undefined;
+
+        // Call the service to update
+        const updatedMeetup = await updateMeetup(
+            meetupId,
+            userId,  // updatedBy
+            title,
+            description,
+            maxParticipants,
+            sportId,
+            scheduledAt,
+            location,
+            city,
+            state,
+            sportIcon,
+            sportColor,
+            normalizedSkillLevel
+        );
+
+        res.status(200).json({
+            message: 'Meetup updated successfully',
+            meetup: updatedMeetup
+        });
+    } catch (error) {
+        console.error('meetupController: updateMeetupController ERROR:', {
             message: (error as Error).message,
             stack: (error as Error).stack,
         });
