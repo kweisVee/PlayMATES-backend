@@ -42,7 +42,7 @@ model User {
 
   createdSports Sport[] @relation("UserCreatedSports")
   meetups      Meetup[] // One User can create many Meetups
-  // meetups MEETUP[]
+  updatedMeetups Meetup[] @relation("MeetupUpdatedBy")
 }
 
 model Sport {
@@ -88,8 +88,10 @@ model Meetup {
   sportColor      String?
   skillLevel      SkillLevel @default(ALL)
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  updatedAt       DateTime  @updatedAt //updatedAt is already handled by Prisma so it will update when its created or updated
+  updatedBy       Int 
 
   sport      Sport     @relation(fields: [sportId], references: [id])
   creator    User      @relation(fields: [createdBy], references: [id])
+  updater    User      @relation("MeetupUpdatedBy", fields: [updatedBy], references: [id])
 }
