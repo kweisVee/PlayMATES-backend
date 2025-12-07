@@ -43,6 +43,7 @@ model User {
   createdSports Sport[] @relation("UserCreatedSports")
   meetups      Meetup[] // One User can create many Meetups
   updatedMeetups Meetup[] @relation("MeetupUpdatedBy")
+  participantMeetups MeetupParticipant[] // Many-to-many relationship for participants
 }
 
 model Sport {
@@ -94,4 +95,19 @@ model Meetup {
   sport      Sport     @relation(fields: [sportId], references: [id])
   creator    User      @relation(fields: [createdBy], references: [id])
   updater    User      @relation("MeetupUpdatedBy", fields: [updatedBy], references: [id])
+  participants MeetupParticipant[] // Many-to-many relationship for participants
+}
+
+model MeetupParticipant {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  meetupId  Int
+  joinedAt  DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meetup  Meetup  @relation(fields: [meetupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, meetupId]) // Prevent duplicate participants
+  @@index([meetupId])
+  @@index([userId])
 }

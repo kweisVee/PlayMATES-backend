@@ -47,7 +47,13 @@ export const createMeetup = async (
             sportIcon,
             sportColor,
             skillLevel,
-            scheduledAt
+            scheduledAt,
+            // Automatically add the creator as a participant
+            participants: {
+                create: {
+                    userId: createdBy
+                }
+            }
         },
         include: {
             creator: {
@@ -62,6 +68,18 @@ export const createMeetup = async (
                 select: {
                     id: true, 
                     name: true
+                }
+            },
+            participants: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
                 }
             }
         }
@@ -100,11 +118,14 @@ export const getAllMeetups = async () => {
     })
 }
 
-export const getUserMeetups = async (userId: number) => {
-    console.log("meetupService.ts: getUserMeetups starting...");
+export const getUserHostedMeetups = async (userId: number) => {
+    console.log("meetupService.ts: getUserHostedMeetups starting...");
     return await prisma.meetup.findMany({
         where: {
             createdBy: userId
+        },
+        orderBy: {
+            scheduledAt: 'desc' // Most recent scheduled date first
         },
         include: {
             creator: {
@@ -118,6 +139,36 @@ export const getUserMeetups = async (userId: number) => {
                     id: true,
                     name: true
                 }
+            }
+        }
+    })
+}
+
+export const getUserJoinedMeetups = async (userId: number) => {
+    console.log("meetupService.ts: getUserJoinedMeetups starting...");
+    return await prisma.meetupParticipant.findMany({
+        where: { userId },
+        include: {
+            meetup: {
+                include: {
+                    creator: {
+                        select: {
+                            id: true,
+                            username: true
+                        }
+                    },
+                    sport: {
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    }
+                }
+            }
+        },
+        orderBy: {
+            meetup: {
+                scheduledAt: 'desc'
             }
         }
     })

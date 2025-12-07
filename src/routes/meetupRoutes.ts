@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { createMeetupController, 
         getAllMeetupsController, 
-        getUserMeetupsController,
+        getUserHostedMeetupsController,
+        getUserJoinedMeetupsController,
         getMeetupController,
         updateMeetupController
     } from "../controllers/meetupController";
@@ -16,7 +17,10 @@ router.post("/", authenticateToken, createMeetupController);
 router.get("/", getAllMeetupsController);
 
 // Route for getting all user meetups
-router.get('/user', authenticateToken, getUserMeetupsController);
+router.get('/user/hosted', authenticateToken, getUserHostedMeetupsController);
+
+// Route for getting all user joined meetups
+router.get('/user/joined', authenticateToken, getUserJoinedMeetupsController);
 
 // Route for updating a meetup (MUST be before /:id route)
 router.put("/:id", authenticateToken, updateMeetupController);

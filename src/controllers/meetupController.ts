@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { createMeetup, 
         getAllMeetups, 
-        getUserMeetups, 
+        getUserHostedMeetups, 
+        getUserJoinedMeetups,
         getMeetup,
         updateMeetup
     } from "../services/meetupService";
@@ -135,8 +136,8 @@ export const getAllMeetupsController = async (req: Request, res: Response): Prom
     }
 }
 
-export const getUserMeetupsController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-    console.log("meetupController: getUserMeetupsController Starting...");
+export const getUserHostedMeetupsController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    console.log("meetupController: getUserHostedMeetupsController Starting...");
     try {
         const userId = req.user?.userId;
 
@@ -145,7 +146,7 @@ export const getUserMeetupsController = async (req: AuthenticatedRequest, res: R
             return;
         }
 
-        const meetups = await getUserMeetups(userId);
+        const meetups = await getUserHostedMeetups(userId);
         
         // Transform the data to match frontend expectations
         const transformedMeetups = meetups.map((meetup: any) => {
@@ -175,7 +176,57 @@ export const getUserMeetupsController = async (req: AuthenticatedRequest, res: R
         
         res.status(200).json(transformedMeetups);
     } catch (error) {
-        console.error('meetupController: getUserMeetupsController ERROR:', {
+        console.error('meetupController: getUserHostedMeetupsController ERROR:', {
+            message: (error as Error).message,
+            stack: (error as Error).stack,
+        });
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const getUserJoinedMeetupsController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    console.log("meetupController: getUserJoinedMeetupsController Starting...");
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            res.status(401).json({ message: 'Unauthorized. No user ID found.' });
+            return;
+        }
+
+        const meetupParticipants = await getUserJoinedMeetups(userId);
+        console.log("getUserJoinedMeetupsController: meetupParticipants: ", meetupParticipants);
+        
+        // Extract meetups from participants and transform the data to match frontend expectations
+        const transformedMeetups = meetupParticipants.map((participant: any) => {
+            const meetup = participant.meetup;
+            const scheduledDate = new Date(meetup.scheduledAt);
+            return {
+                id: meetup.id.toString(),
+                title: meetup.title,
+                description: meetup.description || "",
+                sport: meetup.sport?.name || "",
+                sportIcon: meetup.sportIcon,
+                sportColor: meetup.sportColor,
+                hostId: meetup.createdBy.toString(),
+                hostName: meetup.creator?.username || "",
+                location: meetup.location || "",
+                city: meetup.city || "",
+                state: meetup.state || "",
+                date: scheduledDate.toISOString().split('T')[0], // YYYY-MM-DD format
+                time: scheduledDate.toTimeString().slice(0, 5), // HH:MM format
+                maxParticipants: meetup.maxParticipants,
+                currentParticipants: 1, // Default to 1 (the creator)
+                skillLevel: meetup.skillLevel?.toLowerCase() || "all",
+                status: "upcoming",
+                createdAt: meetup.createdAt,
+                updatedAt: meetup.updatedAt
+            };
+        });
+        
+        res.status(200).json(transformedMeetups);
+    } catch (error) {
+        console.error('meetupController: getUserJoinedMeetupsController ERROR:', {
             message: (error as Error).message,
             stack: (error as Error).stack,
         });
