@@ -4,7 +4,9 @@ import { createMeetup,
         getUserHostedMeetups, 
         getUserJoinedMeetups,
         getMeetup,
-        updateMeetup
+        updateMeetup,
+        joinMeetup,
+        leaveMeetup
     } from "../services/meetupService";
 import { getSportByName } from "../services/sportService";
 import { AuthenticatedRequest } from './userController';
@@ -367,5 +369,83 @@ export const updateMeetupController = async (req: AuthenticatedRequest, res: Res
             stack: (error as Error).stack,
         });
         res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const joinMeetupController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    console.log("meetupController: joinMeetupController Starting...");
+    try {
+        const userId = req.user?.userId;
+        if (!userId) {
+            res.status(401).json({ message: 'Unauthorized. No user ID found.' });
+            return;
+        }
+
+        const meetupId = parseInt(req.params.id);
+        if (isNaN(meetupId) || meetupId <= 0) {
+            res.status(400).json({ message: 'Invalid meetup ID' });
+            return;
+        }
+
+        const meetup = await joinMeetup(meetupId, userId);
+        
+        res.status(200).json({
+            message: 'Successfully joined meetup',
+            meetup: meetup
+        });
+    } catch (error) {
+        const errorMessage = (error as Error).message;
+        console.error('meetupController: joinMeetupController ERROR:', {
+            message: errorMessage,
+            stack: (error as Error).stack,
+        });
+        
+        // Handle specific error cases
+        if (errorMessage.includes("not found")) {
+            res.status(404).json({ message: errorMessage });
+        } else if (errorMessage.includes("already a participant") || errorMessage.includes("full")) {
+            res.status(400).json({ message: errorMessage });
+        } else {
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    }
+}
+
+export const leaveMeetupController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    console.log("meetupController: leaveMeetupController Starting...");
+    try {
+        const userId = req.user?.userId;
+        if (!userId) {
+            res.status(401).json({ message: 'Unauthorized. No user ID found.' });
+            return;
+        }
+
+        const meetupId = parseInt(req.params.id);
+        if (isNaN(meetupId) || meetupId <= 0) {
+            res.status(400).json({ message: 'Invalid meetup ID' });
+            return;
+        }
+
+        const meetup = await leaveMeetup(meetupId, userId);
+        
+        res.status(200).json({
+            message: 'Successfully left meetup',
+            meetup: meetup
+        });
+    } catch (error) {
+        const errorMessage = (error as Error).message;
+        console.error('meetupController: leaveMeetupController ERROR:', {
+            message: errorMessage,
+            stack: (error as Error).stack,
+        });
+        
+        // Handle specific error cases
+        if (errorMessage.includes("not found") || errorMessage.includes("not a participant")) {
+            res.status(404).json({ message: errorMessage });
+        } else if (errorMessage.includes("creators cannot leave")) {
+            res.status(400).json({ message: errorMessage });
+        } else {
+            res.status(500).json({ message: 'Internal server error' });
+        }
     }
 }
