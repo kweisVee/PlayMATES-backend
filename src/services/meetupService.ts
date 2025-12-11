@@ -257,3 +257,145 @@ export const updateMeetup = async (
         }
     });
 }
+
+export const joinMeetup = async (meetupId: number, userId: number) => {
+    console.log("meetupService.ts: joinMeetup starting...");
+    
+    // Check if meetup exists
+    const meetup = await getMeetup(meetupId);
+    if (!meetup) {
+        throw new Error("Meetup not found");
+    }
+    
+    // Check if user is already a participant
+    const existingParticipant = await prisma.meetupParticipant.findUnique({
+        where: {
+            userId_meetupId: {
+                userId,
+                meetupId
+            }
+        }
+    });
+    
+    if (existingParticipant) {
+        throw new Error("User is already a participant in this meetup");
+    }
+    
+    // Check if meetup is full
+    const participantCount = await prisma.meetupParticipant.count({
+        where: { meetupId }
+    });
+    
+    if (participantCount >= meetup.maxParticipants) {
+        throw new Error("Meetup is full");
+    }
+    
+    // Add user as participant
+    await prisma.meetupParticipant.create({
+        data: {
+            userId,
+            meetupId
+        }
+    });
+    
+    // Return updated meetup with participants
+    return await prisma.meetup.findUnique({
+        where: { id: meetupId },
+        include: {
+            creator: {
+                select: {
+                    id: true,
+                    username: true
+                }
+            },
+            sport: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            },
+            participants: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+export const leaveMeetup = async (meetupId: number, userId: number) => {
+    console.log("meetupService.ts: leaveMeetup starting...");
+    
+    // Check if meetup exists
+    const meetup = await getMeetup(meetupId);
+    if (!meetup) {
+        throw new Error("Meetup not found");
+    }
+    
+    // Check if user is the creator (creators shouldn't leave, they should cancel)
+    if (meetup.createdBy === userId) {
+        throw new Error("Meetup creators cannot leave their own meetup. Please cancel the meetup instead.");
+    }
+    
+    // Check if user is a participant
+    const participant = await prisma.meetupParticipant.findUnique({
+        where: {
+            userId_meetupId: {
+                userId,
+                meetupId
+            }
+        }
+    });
+    
+    if (!participant) {
+        throw new Error("User is not a participant in this meetup");
+    }
+    
+    // Remove user as participant
+    await prisma.meetupParticipant.delete({
+        where: {
+            userId_meetupId: {
+                userId,
+                meetupId
+            }
+        }
+    });
+    
+    // Return updated meetup with participants
+    return await prisma.meetup.findUnique({
+        where: { id: meetupId },
+        include: {
+            creator: {
+                select: {
+                    id: true,
+                    username: true
+                }
+            },
+            sport: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            },
+            participants: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            }
+        }
+    });
+}

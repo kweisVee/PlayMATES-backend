@@ -4,7 +4,9 @@ import { createMeetupController,
         getUserHostedMeetupsController,
         getUserJoinedMeetupsController,
         getMeetupController,
-        updateMeetupController
+        updateMeetupController,
+        joinMeetupController,
+        leaveMeetupController
     } from "../controllers/meetupController";
 import { authenticateToken } from "../middleware/authMiddleware";
 
@@ -24,6 +26,12 @@ router.get('/user/joined', authenticateToken, getUserJoinedMeetupsController);
 
 // Route for updating a meetup (MUST be before /:id route)
 router.put("/:id", authenticateToken, updateMeetupController);
+
+// Route for joining a meetup (MUST be before /:id route)
+router.post("/:id/join", authenticateToken, joinMeetupController);
+
+// Route for leaving a meetup (MUST be before /:id route)
+router.post("/:id/leave", authenticateToken, leaveMeetupController);
 
 // Route for getting a specific meetup
 router.get("/:id", authenticateToken, getMeetupController);
