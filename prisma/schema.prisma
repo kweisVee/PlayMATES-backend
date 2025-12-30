@@ -96,6 +96,10 @@ model Meetup {
   creator    User      @relation(fields: [createdBy], references: [id])
   updater    User      @relation("MeetupUpdatedBy", fields: [updatedBy], references: [id])
   participants MeetupParticipant[] // Many-to-many relationship for participants
+
+  @@index([createdBy]) // Index for getUserHostedMeetups queries
+  @@index([scheduledAt]) // Index for filtering and ordering by date
+  @@index([sportId]) // Index for filtering by sport
 }
 
 model MeetupParticipant {
