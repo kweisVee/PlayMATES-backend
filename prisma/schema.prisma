@@ -39,6 +39,7 @@ model User {
   role      Role        @default(USER)  
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+  lastLogin DateTime    @default(now())
 
   createdSports Sport[] @relation("UserCreatedSports")
   meetups      Meetup[] // One User can create many Meetups
