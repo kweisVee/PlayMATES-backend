@@ -129,6 +129,12 @@ export const signInUser = async (email: string, password: string) => {
     if (!isPasswordValid) {
         return 'Invalid Credentials';
     } else {
+
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { lastLogin: new Date() },
+        });
+        
         return {
             id: user.id,
             firstName: user.firstName,
