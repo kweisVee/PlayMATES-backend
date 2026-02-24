@@ -147,7 +147,14 @@ export const getUserHostedMeetups = async (userId: number) => {
 export const getUserJoinedMeetups = async (userId: number) => {
     console.log("meetupService.ts: getUserJoinedMeetups starting...");
     return await prisma.meetupParticipant.findMany({
-        where: { userId },
+        where: {
+            userId,
+            meetup: {
+                createdBy: {
+                    not: userId
+                }
+            }
+        },
         include: {
             meetup: {
                 include: {
@@ -189,6 +196,18 @@ export const getMeetup = async (meetupId: number) => {
                 select: {
                     id: true,
                     name: true
+                }
+            },
+            participants: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
                 }
             }
         }

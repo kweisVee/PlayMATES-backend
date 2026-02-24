@@ -107,6 +107,10 @@ const signInUser = async (email, password) => {
         return 'Invalid Credentials';
     }
     else {
+        await db_1.default.user.update({
+            where: { id: user.id },
+            data: { lastLogin: new Date() },
+        });
         return {
             id: user.id,
             firstName: user.firstName,

@@ -261,7 +261,37 @@ export const getMeetupController = async (req: AuthenticatedRequest, res: Respon
             return;
         }
 
-        res.status(200).json(meetup);
+        // Transform the data to match frontend expectations
+        const scheduledDate = new Date(meetup.scheduledAt);
+        const transformedMeetup = {
+            id: meetup.id.toString(),
+            title: meetup.title,
+            description: meetup.description || "",
+            sport: meetup.sport?.name || "",
+            sportIcon: meetup.sportIcon,
+            sportColor: meetup.sportColor,
+            hostId: meetup.createdBy.toString(),
+            hostName: meetup.creator?.username || "",
+            location: meetup.location || "",
+            city: meetup.city || "",
+            state: meetup.state || "",
+            date: scheduledDate.toISOString().split('T')[0], // YYYY-MM-DD format
+            time: scheduledDate.toTimeString().slice(0, 5), // HH:MM format
+            maxParticipants: meetup.maxParticipants,
+            currentParticipants: meetup.participants?.length || 0,
+            skillLevel: meetup.skillLevel?.toLowerCase() || "all",
+            status: "upcoming",
+            participants: meetup.participants?.map((participant: any) => ({
+                id: participant.user.id.toString(),
+                firstName: participant.user.firstName,
+                lastName: participant.user.lastName,
+                joinedAt: participant.joinedAt
+            })) || [],
+            createdAt: meetup.createdAt,
+            updatedAt: meetup.updatedAt
+        };
+
+        res.status(200).json(transformedMeetup);
     } catch (error) {
         console.error('meetupController: getMeetupController ERROR:', {
             message: (error as Error).message,
