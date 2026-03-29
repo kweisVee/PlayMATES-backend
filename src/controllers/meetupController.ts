@@ -120,14 +120,14 @@ export const getAllMeetupsController = async (req: Request, res: Response): Prom
                 date: scheduledDate.toISOString().split('T')[0], // YYYY-MM-DD format
                 time: scheduledDate.toTimeString().slice(0, 5), // HH:MM format
                 maxParticipants: meetup.maxParticipants,
-                currentParticipants: 1, // Default to 1 (the creator)
+                currentParticipants: meetup._count?.participants || 0,
                 skillLevel: meetup.skillLevel?.toLowerCase() || "all",
                 status: "upcoming",
                 createdAt: meetup.createdAt,
                 updatedAt: meetup.updatedAt
             };
         });
-        
+
         res.status(200).json(transformedMeetups);
     } catch (error) {
         console.error('meetupController: getAllMeetupsController ERROR:', {
@@ -168,14 +168,14 @@ export const getUserHostedMeetupsController = async (req: AuthenticatedRequest, 
                 date: scheduledDate.toISOString().split('T')[0], // YYYY-MM-DD format
                 time: scheduledDate.toTimeString().slice(0, 5), // HH:MM format
                 maxParticipants: meetup.maxParticipants,
-                currentParticipants: 1, // Default to 1 (the creator)
+                currentParticipants: meetup._count?.participants || 0,
                 skillLevel: meetup.skillLevel?.toLowerCase() || "all",
                 status: "upcoming",
                 createdAt: meetup.createdAt,
                 updatedAt: meetup.updatedAt
             };
         });
-        
+
         res.status(200).json(transformedMeetups);
     } catch (error) {
         console.error('meetupController: getUserHostedMeetupsController ERROR:', {
@@ -218,14 +218,14 @@ export const getUserJoinedMeetupsController = async (req: AuthenticatedRequest, 
                 date: scheduledDate.toISOString().split('T')[0], // YYYY-MM-DD format
                 time: scheduledDate.toTimeString().slice(0, 5), // HH:MM format
                 maxParticipants: meetup.maxParticipants,
-                currentParticipants: 1, // Default to 1 (the creator)
+                currentParticipants: meetup._count?.participants || 0,
                 skillLevel: meetup.skillLevel?.toLowerCase() || "all",
                 status: "upcoming",
                 createdAt: meetup.createdAt,
                 updatedAt: meetup.updatedAt
             };
         });
-        
+
         res.status(200).json(transformedMeetups);
     } catch (error) {
         console.error('meetupController: getUserJoinedMeetupsController ERROR:', {

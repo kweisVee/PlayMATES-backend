@@ -113,6 +113,9 @@ export const getAllMeetups = async () => {
                     id: true,
                     name: true
                 }
+            },
+            _count: {
+                select: { participants: true }
             }
         }
     })
@@ -139,6 +142,9 @@ export const getUserHostedMeetups = async (userId: number) => {
                     id: true,
                     name: true
                 }
+            },
+            _count: {
+                select: { participants: true }
             }
         }
     })
@@ -169,6 +175,9 @@ export const getUserJoinedMeetups = async (userId: number) => {
                             id: true,
                             name: true
                         }
+                    },
+                    _count: {
+                        select: { participants: true }
                     }
                 }
             }
